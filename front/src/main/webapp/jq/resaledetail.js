@@ -1,4 +1,4 @@
-$(function () {
+    $(function () {
     // 로딩되자마자 글 불러오기
     let queryString = location.search.split("=")[1].split("%")[0];
     // console.log("쿼리스트링값 " + queryString);
@@ -67,7 +67,7 @@ $(function () {
 
             $(commentObj).each(function (i, comment) {
             let $commentCopy = $comment.clone();
-            // console.log(comment);
+            console.log(comment);
             $commentCopy
                 .find("div.comment-list__nickname")
                 .html(comment.userNickname);
@@ -110,9 +110,9 @@ $(function () {
             let likeObj = jsonObj.t.resaleBoard.resaleLike;
             // console.log(likeObj);
 
-            $.each(likeObj, function (i, like) {
+            $(likeObj).each(function (i, like) {
             likedNickname = like.userNickname;
-            // console.log("좋아요 한 사람들 : " + likedNickname);
+            console.log("좋아요 한 사람들 : " + likedNickname);
             if (likedNickname == loginedNickname) {
                 //localStorage.getItem("loginedNickname")
                 // 세션 아이디와 좋아요 한 닉네임이 같으면
@@ -174,8 +174,6 @@ $(function () {
         userNickname: cmtNickname,
         resaleBoard: { resaleBoardNo: resaleBoardNo },
         };
-        console.log(obj);
-        console.log(resaleBoardNo);
         $.ajax({
         url: "http://localhost:1126/backresale/resale/comment/write",
         method: "post",

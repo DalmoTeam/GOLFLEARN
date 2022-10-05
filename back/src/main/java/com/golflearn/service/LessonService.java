@@ -1,15 +1,17 @@
 package com.golflearn.service;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.golflearn.domain.LessonHistoryRepository;
 import com.golflearn.domain.LessonRepository;
+import com.golflearn.domain.PaymentRepository;
 import com.golflearn.dto.Lesson;
 import com.golflearn.dto.LessonLine;
+import com.golflearn.dto.Payment;
 import com.golflearn.exception.AddException;
-
 import com.golflearn.exception.FindException;
 
 @Service(value="lessonService")
@@ -19,6 +21,9 @@ public class LessonService {
 
 	@Autowired
 	private LessonRepository lsnRepository;
+	
+	@Autowired
+	private PaymentRepository paymentRepository;
 	
 	/**
 	 * 레슨번호의 레슨을 반환한다
@@ -50,6 +55,13 @@ public class LessonService {
 	
 	public List<Lesson> viewMain() throws FindException {
 		return lsnRepository.selectAll();
+	}
+	
+	/**
+	 * 결제 요청한다.
+	 */
+	public void addPayment(Payment payment) throws AddException{
+		paymentRepository.insertPayment(payment);
 	}
 	
 }

@@ -100,7 +100,7 @@
   		FROM DUAL
 	</insert>
   <select id="selectAll" resultMap="lessonsMap">
-	SELECT lsn_no, loc_no, lsn_title, lsn_star_sum, lsn_star_ppl_cnt, ui.user_name
+	SELECT lsn_no, loc_no, lsn_title, lsn_star_sum, lsn_star_ppl_cnt, ui.user_name,  TRUNC((l.lsn_star_sum/l.lsn_star_ppl_cnt), 2) lsnStarScore
 	FROM lesson l JOIN user_info ui ON(l.user_id = ui.user_id)
 	ORDER BY 1 DESC
 </select>

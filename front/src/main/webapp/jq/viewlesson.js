@@ -109,6 +109,14 @@ $(function () {
 						// msg += "결제 금액 : " + rsp.paid_amount;
 						// msg += "카드 승인번호 : " + rsp.apply_num;
 						// msg += "결제 수단 : " + rsp.pay_method;
+						$.ajax({
+							url:"http://localhost:1124/back/lesson/payment",
+							method:"post",
+							headers: { "Content-Type": "application/json" },
+							data:{paymentNo: merchant_uid,paymentMethod : pay_method},
+							success:"",
+							error:"",
+						});
 					} else {
 						var msg = "결제에 실패하였습니다.";
 						msg += "에러내용 : " + rsp.error_msg;

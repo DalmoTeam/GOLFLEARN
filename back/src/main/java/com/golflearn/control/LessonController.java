@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.golflearn.dto.Lesson;
 import com.golflearn.dto.LessonClassification;
 import com.golflearn.dto.LessonLine;
+import com.golflearn.dto.Payment;
 import com.golflearn.dto.ResultBean;
 import com.golflearn.dto.UserInfo;
 import com.golflearn.exception.AddException;
@@ -202,4 +203,9 @@ public class LessonController {
 
 		}
 	}
+//	
+//	@PostMapping(value="")
+//	public ResultBean<Payment> payment(){
+//		
+//	}
 }
