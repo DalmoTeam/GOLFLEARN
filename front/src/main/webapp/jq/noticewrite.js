@@ -96,7 +96,7 @@
             url: "http://localhost:1128/noticeboard/notice/" + noticeBoardNo,
             method: "get",
             success: function (jsonObj) {
-            let detailObj = jsonObj.t;
+            let detailObj = jsonObj.t.noticeBoard;
             let $formObj =$("form.write");
             console.log($formObj[0]);
             let content = detailObj.noticeBoardContent;
@@ -168,7 +168,7 @@
         // formData.append(key, value);
     });
 
-    let obj2 = formData.get("imageFiles");
+    let obj2 = formData.get("imageFile");
     console.log(obj2);
     alert(obj2);
     if (obj2.size <= 0) {

@@ -55,7 +55,7 @@ import net.coobird.thumbnailator.Thumbnailator;
 import com.golflearn.dto.PageBean;
 
 
-@CrossOrigin(origins="*")
+@CrossOrigin(origins="*" , allowedHeaders = "*")
 @RestController
 @RequestMapping("notice/*")
 public class NoticeBoardController {
@@ -69,8 +69,10 @@ public class NoticeBoardController {
 
 	//	@Value("${spring.servlet.multipart.location}")
 	//	private String saveDirectory;
-
-	String uploadDirectory = "/images/";
+	// 파일 저장 경로
+	String uploadDirectory = "C://Project/GolfLearn/BackNotice/images/";
+	// 도커 사용 시 ▼ - 상대 경로로
+//	String uploadDirectory = "/images/";
 	//			"C:\\Project\\GolfLearn\\front\\src\\main\\webapp\\";
 
 	@GetMapping(value= {"list", "list/{optCp}"}) //두개의값 모두 전달 OK
@@ -131,6 +133,8 @@ public class NoticeBoardController {
 		return rb;
 	}
 
+	
+	// 상세보기
 	//	@GetMapping("{boardNo}")
 	//	public ResultBean<NoticeBoardDto> viewBoard(@PathVariable int boardNo) {
 	//		ResultBean<NoticeBoardDto> rb = new ResultBean<>();
@@ -145,12 +149,13 @@ public class NoticeBoardController {
 	//		}
 	//		return rb;
 	//	}
-
+	
+	@GetMapping("{boardNo}")
 	public ResultBean<Map<String, Object>> viewBoard(@PathVariable int boardNo) {
 		Map<String, Object> map = new HashMap<>();
 		try {
 			NoticeBoardDto b = service.viewNoticeBoard(boardNo);
-			map.put("noticeBoard,", b);
+			map.put("noticeBoard", b);
 		} catch (FindException e) {
 			e.printStackTrace();
 			map.put("status", 0);
@@ -184,12 +189,12 @@ public class NoticeBoardController {
 
 
 	@PostMapping(value = "/writeboard")
-	public ResponseEntity<?> write(@RequestPart(required = false) MultipartFile imageFiles, NoticeBoardDto noticeBoard){
+	public ResponseEntity<?> write(@RequestPart(required = false) MultipartFile imageFile, NoticeBoardDto noticeBoard){
 
 		logger.info("요청전달데이터 title=" + noticeBoard.getNoticeBoardTitle() + ", content=" + noticeBoard.getNoticeBoardContent());
 		//		logger.info("letterFiles.size()=" + letterFiles.size());
-		logger.info("imageFile.getSize()=" + imageFiles.getSize() + ", imageFile.getOriginalFileName()=" + imageFile.getOriginalFilename());
-		HttpHeaders responseHeaders = new HttpHeaders();
+		logger.info("imageFile.getSize()=" + imageFile.getSize() + ", imageFile.getOriginalFileName()=" + imageFile.getOriginalFilename());
+//		HttpHeaders responseHeaders = new HttpHeaders();
 		System.out.println("제목" + noticeBoard.getNoticeBoardContent());
 		NoticeBoardDto nbDto = new NoticeBoardDto();
 
@@ -232,61 +237,120 @@ public class NoticeBoardController {
 			new File(saveDirectory).mkdirs();
 		}
 
+		//이미지 저장
+		int savedImgFileCnt = 0; // 서버에 저장된 파일 수
+		if(!imageFile.isEmpty()) {
+		File thumbnailFile = null;	
+				Long imageFileSize = imageFile.getSize(); // 파일 크기
+				if(imageFileSize > 0) { // 파일이 첨부되었을 경우
 
-		int savedletterFileCnt = 0;//서버에 저장된 파일수
-		logger.info("저장된 letter 파일개수: " + savedletterFileCnt);
-		File thumbnailFile = null;
-		long imageFileSize = imageFiles.getSize();
-		int imageFileCnt = 0;//서버에 저장된 이미지파일수
-		if(imageFileSize > 0) {
-			//이미지파일 저장하기
-			String imageOrignFileName = imageFiles.getOriginalFilename(); //이미지파일원본이름얻기
-			String fileExtension = imageOrignFileName.substring(imageOrignFileName.lastIndexOf("."));
-			logger.info("이미지 파일이름:" + imageOrignFileName +", 파일크기: " + imageFiles.getSize());
+					// 파일 확장자 가지고 오기
+					String originFileName = imageFile.getOriginalFilename();
+					logger.error("파일이름은 " + originFileName);
+					String fileExtension = originFileName.substring(originFileName.lastIndexOf("."));
+					logger.error("파일 확장자는" + fileExtension);
 
-			//저장할 파일이름을 지정한다 ex) 글번호_image_XXXX_원본이름
-			String imageFileName = wroteBoardNo + "_image_1" + fileExtension;
-			//이미지파일생성
-			File savedImageFile = new File(saveDirectory, imageFileName);
-			try {
-				FileCopyUtils.copy(imageFiles.getBytes(), savedImageFile);
-				logger.info("이미지 파일저장:" + savedImageFile.getAbsolutePath());
+					//저장파일 이름 생성
+					String savedImageFileName = "image_"+ (savedImgFileCnt+1) + fileExtension;
+					//이미지 파일 생성
+					File savedImageFile = new File(saveDirectory, savedImageFileName);
 
-				//파일형식 확인
-				String contentType = imageFiles.getContentType();
-				if(!contentType.contains("image/*")) { //이미지파일형식이 아닌 경우
-					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+					try {
+						// 파일 저장
+						FileCopyUtils.copy(imageFile.getBytes(), savedImageFile);
+
+						// 파일 타입 확인
+						String contentType = imageFile.getContentType();
+						if(contentType.contains("image/*")) {
+							System.out.println("파일타입" + imageFile.getContentType());
+							return new ResponseEntity<> ("이미지 파일이 아닙니다", HttpStatus.INTERNAL_SERVER_ERROR) ;
+						}
+						savedImgFileCnt++;
+
+						//썸네일 만들기
+						String thumbnailName = "s_" + "image_1" + ".PNG";
+						thumbnailFile = new File(saveDirectory, thumbnailName);
+						
+						FileOutputStream thumbnailOS = new FileOutputStream(thumbnailFile);
+						InputStream imageFileIS = imageFile.getInputStream();
+						int width = 100;
+						int height = 100;
+						Thumbnailator.createThumbnail(imageFileIS, thumbnailOS , width, height);
+					} catch (IOException e) {
+						e.printStackTrace();
+						return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+					//						
+				}else {
+					logger.error("이미지 파일이 없습니다");
+					return new ResponseEntity<>("이미지 파일이 없습니다", HttpStatus.INTERNAL_SERVER_ERROR);
 				}
-				//이미지파일인 경우 섬네일파일을 만듦
-				String thumbnailName =  "s_"+imageFileName; //섬네일 파일명은 s_글번호_XXXX_원본이름
-				thumbnailFile = new File(saveDirectory,thumbnailName);
-				FileOutputStream thumbnailOS;
-				thumbnailOS = new FileOutputStream(thumbnailFile);
-				InputStream imageFileIS = imageFiles.getInputStream();
-				int width = 100;
-				int height = 100;
-				Thumbnailator.createThumbnail(imageFileIS, thumbnailOS, width, height);
-				logger.info("섬네일파일 저장:" + thumbnailFile.getAbsolutePath() + ", 섬네일파일 크기:" + thumbnailFile.length());
-				//				//이미지 썸네일다운로드하기
-				//				HttpHeaders responseHeaders = new HttpHeaders();
-				//				responseHeaders.set(HttpHeaders.CONTENT_LENGTH, thumbnailFile.length()+"");
-				//				responseHeaders.set(HttpHeaders.CONTENT_TYPE, Files.probeContentType(thumbnailFile.toPath()));
-				//				responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename="+URLEncoder.encode("a", "UTF-8"));
-				//				logger.info("섬네일파일 다운로드");
-				return new ResponseEntity<>(FileCopyUtils.copyToByteArray(thumbnailFile), 
-//						responseHeaders, 
-						HttpStatus.OK);
-
-			} catch (IOException e2) {
-				e2.printStackTrace();
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-		}//end if(imageFileSize > 0) 
-		else {
-			logger.error("이미지파일이 없습니다");
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		
+		return new ResponseEntity<>("저장 완료", HttpStatus.OK);
+
 	}
+		
+		
+//		int savedletterFileCnt = 0;//서버에 저장된 파일수
+//		logger.info("저장된 letter 파일개수: " + savedletterFileCnt);
+//		File thumbnailFile = null;
+//		long imageFileSize = imageFile.getSize();
+//		int imageFileCnt = 0;//서버에 저장된 이미지파일수
+//		if(imageFileSize > 0) {
+//			//이미지파일 저장하기
+//			String imageOrignFileName = imageFile.getOriginalFilename(); //이미지파일원본이름얻기
+//			String fileExtension = imageOrignFileName.substring(imageOrignFileName.lastIndexOf("."));
+//			logger.info("이미지 파일이름:" + imageOrignFileName +", 파일크기: " + imageFile.getSize());
+//
+//			//저장할 파일이름을 지정한다 ex) 글번호_image_XXXX_원본이름
+//			String imageFileName = wroteBoardNo + "_image_1" + ".PNG";
+//			//이미지파일생성
+//			File savedImageFile = new File(saveDirectory, imageFileName);
+//			try {
+//				FileCopyUtils.copy(imageFile.getBytes(), savedImageFile);
+//				logger.info("이미지 파일저장:" + savedImageFile.getAbsolutePath());
+//
+//				//파일형식 확인
+//				String contentType = imageFile.getContentType();
+//				if(!contentType.contains("image/*")) { //이미지파일형식이 아닌 경우
+//					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//				}
+//				//이미지파일인 경우 섬네일파일을 만듦
+//				String thumbnailName =  "s_"+imageFileName; //섬네일 파일명은 s_글번호_XXXX_원본이름
+//				thumbnailFile = new File(saveDirectory,thumbnailName);
+//				FileOutputStream thumbnailOS;
+//				thumbnailOS = new FileOutputStream(thumbnailFile);
+//				InputStream imageFileIS = imageFile.getInputStream();
+//				int width = 100;
+//				int height = 100;
+//				Thumbnailator.createThumbnail(imageFileIS, thumbnailOS, width, height);
+//				logger.info("섬네일파일 저장:" + thumbnailFile.getAbsolutePath() + ", 섬네일파일 크기:" + thumbnailFile.length());
+//				//				//이미지 썸네일다운로드하기
+//				//				HttpHeaders responseHeaders = new HttpHeaders();
+//				//				responseHeaders.set(HttpHeaders.CONTENT_LENGTH, thumbnailFile.length()+"");
+//				//				responseHeaders.set(HttpHeaders.CONTENT_TYPE, Files.probeContentType(thumbnailFile.toPath()));
+//				//				responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename="+URLEncoder.encode("a", "UTF-8"));
+//				//				logger.info("섬네일파일 다운로드");
+//				return new ResponseEntity<>(FileCopyUtils.copyToByteArray(thumbnailFile), 
+////						responseHeaders, 
+//						HttpStatus.OK);
+//
+//			} catch (IOException e2) {
+//				e2.printStackTrace();
+//				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//			}
+//		}//end if(imageFileSize > 0) 
+//		else {
+//			logger.error("이미지파일이 없습니다");
+//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//	}
+	
+	
+	
+	
+	
 
 	@PutMapping(value="{boardNo}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> modify(
@@ -466,7 +530,7 @@ public class NoticeBoardController {
 	 */
 	@GetMapping(value ="/downloadimage")
 	public ResponseEntity<?>  downloadImage(String boardNo){
-		File thumbnailFile = new File(uploadDirectory+"/notice_images/"+boardNo, "s_1.jpg");
+		File thumbnailFile = new File(uploadDirectory+"/notice_images/"+boardNo, "s_1.PNG");
 		HttpHeaders responseHeaders = new HttpHeaders();
 		try {
 			responseHeaders.set(HttpHeaders.CONTENT_LENGTH, thumbnailFile.length()+"");

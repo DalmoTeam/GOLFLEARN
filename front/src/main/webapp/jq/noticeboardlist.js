@@ -19,12 +19,12 @@ $(function () {
             // 원본 하나 선택 후 나머지 게시글의 div삭제하는 작업
             $("div.board-list").not($board1).remove();
             let $board = $("div.boardlist__content").first();
-            // let src = "../notice_image/";
+            let src = "../notice_image/";
             $board1.empty();
             $(pageBeanObj.list).each(function (index, board) {
                 let $boardCopy = $board.clone();
                 console.log(board.userNickname); // 출력됨
-                console.log("게시판 번호"+board.noticeBoardNo);
+                console.log(board.noticeBoardNo);
                 $.ajax({
                     url: "http://localhost:1128/noticeboard/notice/downloadimage",
                     data: "boardNo=" + board.noticeBoardNo,

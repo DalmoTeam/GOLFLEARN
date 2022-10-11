@@ -52,7 +52,6 @@ import net.coobird.thumbnailator.Thumbnailator;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-//@CrossOrigin(origins = "http://172.31.192.1:5500/", allowCredentials = "true")
 @RestController
 @RequestMapping("resale/*")
 public class ResaleBoardContoller {
@@ -65,9 +64,9 @@ public class ResaleBoardContoller {
 	private ServletContext sc;
 
 	// 파일 저장 경로
-	//	@Value("${spring.servlet.multipart.location}") // 이 경로 사용 시 임시 파일이 만들어짐
-//	String uploadDirectory = "C:\\Project\\GolfLearn\\front\\src\\main\\webapp\\";
-	String uploadDirectory = "/images/";
+	String uploadDirectory = "C://Project/GolfLearn/BackResale/images/";
+	// 도커 사용 시 - 상대 경로
+//	String uploadDirectory = "/images/";
 
 	/**
 	 * 게시글 목록보기
@@ -77,15 +76,15 @@ public class ResaleBoardContoller {
 	@GetMapping(value={"board/list","board/list/{optCp}"})
 	public ResultBean<Page<ResaleBoardDto>> boardList(@PathVariable Optional<Integer> optCp,
 			@PageableDefault(page = 0, size = 5, sort = "resaleBoardNo", direction = Direction.DESC) Pageable pageable){
-		// 요청전달데이터 전달 되지 않을 때를 대비하여 사용하는 RESTful의  @PathVariable은 Optional로 설정해줘야함 
+		// 요청전달데이터 전달 되지 않을 때를 대비하여 사용하는 RESTful의  @PathVariable은 Optional로 설정 
 
 		ResultBean<Page<ResaleBoardDto>> rb = new ResultBean<>();
 		try {
 			int currentPage;
-			if(optCp.isPresent()) { //currentPage 가 있으면(optional)
-				currentPage = optCp.get() -1 ; // 0페이지가 시작
+			if(optCp.isPresent()) { //currentPage 가 있으면
+				currentPage = optCp.get() -1 ; // pageable -> 0페이지가 시작
 			}else { // 없으면
-				currentPage = 0;				
+				currentPage = 0; // 1페이지
 			}
 			Page<ResaleBoardDto> pb = service.boardList(currentPage);
 			rb.setStatus(1);
@@ -119,9 +118,10 @@ public class ResaleBoardContoller {
 
 		// 저장된 이미지 파일의 이름을 가지고 오는 것 -> 사진 불러올 때 저장된 개수만큼 불러와야함
 		String saveDirectory = uploadDirectory +"/"+ "resale_images" + "/" +resaleBoardNo + "/";
-//		System.out.println("경로는" + saveDirectory);
+		
 		File dir = new File(saveDirectory);
-
+		
+		// 이미지명 반환
 		String[] imageFiles = dir.list(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -149,6 +149,7 @@ public class ResaleBoardContoller {
 			@PathVariable Optional<String> optWord,
 			@PathVariable Optional<Integer> optCp,
 			@PageableDefault(page = 0, size = 5, sort = "resaleBoardNo", direction = Direction.DESC) Pageable pageable){
+		// 5페이지씩, 5개 게시글씩, 최신순으로 나열
 		ResultBean<Page<ResaleBoardDto>> rb = new ResultBean<>();
 
 		try {
@@ -162,7 +163,7 @@ public class ResaleBoardContoller {
 
 			int currentPage;
 			if(optCp.isPresent()) {
-				currentPage = optCp.get()-1; // 0페이지가 시작
+				currentPage = optCp.get()-1; 
 			} else {
 				currentPage = 0;
 			}
@@ -194,18 +195,16 @@ public class ResaleBoardContoller {
 	public ResponseEntity<?> writeBoard (@RequestPart(required = false)List<MultipartFile> imageFiles,
 			ResaleBoardDto dto) {
 		logger.error("board/write start");
-		//		String loginedNickname = (String) session.getAttribute("loginNickname");
 		// 입력 내용 게시글 저장
 		ResaleBoardDto boardDto = new ResaleBoardDto();
-		//		String loginedNickname = "땡초";
-		//		System.out.println(dto.getResaleBoardTitle());
+		//		String loginedNickname = "땡초"; // 테스트용 로그인 정보 
 		try {
 			dto.setUserNickname(dto.getUserNickname());
 			boardDto = service.writeBoard(dto);
 		} catch (AddException e1) {
 			e1.printStackTrace();
 		}
-		logger.error("setUserNickName");
+//		logger.error("setUserNickName");
 		Long resaleBoardNo = boardDto.getResaleBoardNo();
 		//		logger.error("글번호는"+boardDto.getResaleBoardNo());
 
@@ -246,11 +245,12 @@ public class ResaleBoardContoller {
 							System.out.println("파일타입" + imageFile.getContentType());
 							return new ResponseEntity<> ("이미지 파일이 아닙니다", HttpStatus.INTERNAL_SERVER_ERROR) ;
 						}
-						savedImgFileCnt++;
+						savedImgFileCnt++; 
 
 						//썸네일 만들기
-						String thumbnailName = "s_" + (savedImgFileCnt) + fileExtension;
+						String thumbnailName = "s_" + (savedImgFileCnt) + ".jpg";
 						thumbnailFile = new File(saveDirectory, thumbnailName);
+						
 						FileOutputStream thumbnailOS = new FileOutputStream(thumbnailFile);
 						InputStream imageFileIS = imageFile.getInputStream();
 						int width = 100;
@@ -281,7 +281,6 @@ public class ResaleBoardContoller {
 	 */
 	@PutMapping(value="board/{resaleBoardNo}",produces = MediaType.APPLICATION_JSON_VALUE) 
 	public ResponseEntity<?> modifyBoard(@PathVariable Long resaleBoardNo, 
-			//@RequestPart(required = false) List<MultipartFile> imageFiles,
 			@RequestBody ResaleBoardDto dto){
 
 		if(dto.getResaleBoardTitle() == null || dto.getResaleBoardTitle().equals("")|| 
@@ -297,70 +296,8 @@ public class ResaleBoardContoller {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-	} // 맨 아래
+	} 
 	
-	//		}
-	//		// 파일 저장 폴더
-	//		String saveDirectory = uploadDirectory + "resale_images\\"+ resaleBoardNo; 
-	//		//파일 경로 생성
-	//		if(!new File(saveDirectory).exists()) {
-	//			new File(saveDirectory).mkdirs(); //파일 경로에 폴더 없으면 저장
-	//		}
-	//		//이미지 저장
-	//		Integer savedImgFileCnt = 0; // 서버에 저장된 파일 수
-	//		File thumbnailFile = null;
-	//		if(!imageFiles.isEmpty()) {
-	//			for(MultipartFile imageFile : imageFiles) {
-	//				Long imageFileSize = imageFile.getSize(); // 파일 크기
-	//				if(imageFileSize > 0) { // 파일이 첨부되었을 경우
-	//
-	//					// 파일 확장자 가지고 오기
-	//					String originFileName = imageFile.getOriginalFilename();
-	//					logger.error("파일이름은 " + originFileName);
-	//					String fileExtension = originFileName.substring(originFileName.lastIndexOf("."));
-	//					logger.error("파일 확장자는" + fileExtension);
-	//
-	//					//저장파일 이름 생성
-	//					String savedImageFileName = "image_"+ (savedImgFileCnt+1) + fileExtension;
-	//					//이미지 파일 생성
-	//					File savedImageFile = new File(saveDirectory, savedImageFileName);
-	//
-	//					try {
-	//						// 파일 저장
-	//						FileCopyUtils.copy(imageFile.getBytes(), savedImageFile);
-	//
-	//						// 파일 타입 확인
-	//						String contentType = imageFile.getContentType();
-	//						if(contentType.contains("image/*")) {
-	//							System.out.println("파일타입" + imageFile.getContentType());
-	//							return new ResponseEntity<> ("이미지 파일이 아닙니다", HttpStatus.INTERNAL_SERVER_ERROR) ;
-	//						}
-	//						savedImgFileCnt++;
-	//
-	//						//썸네일 만들기
-	//						String thumbnailName = "s_" + (savedImgFileCnt) + fileExtension;
-	//						thumbnailFile = new File(saveDirectory, thumbnailName);
-	//						FileOutputStream thumbnailOS = new FileOutputStream(thumbnailFile);
-	//						InputStream imageFileIS = imageFile.getInputStream();
-	//						int width = 100;
-	//						int height = 100;
-	//						Thumbnailator.createThumbnail(imageFileIS, thumbnailOS , width, height);
-	//
-	//
-	//					} catch (IOException e) {
-	//						e.printStackTrace();
-	//						return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-	//					}
-	//					//						
-	//				}else {
-	//					logger.error("이미지 파일이 없습니다");
-	//					return new ResponseEntity<>("이미지 파일이 없습니다", HttpStatus.INTERNAL_SERVER_ERROR);
-	//				}
-	//			}
-	//		}
-	//		return null;
-
-
 
 	/**
 	 * 게시글 삭제
@@ -391,7 +328,7 @@ public class ResaleBoardContoller {
 
 
 	/**
-	 * (대)댓글 등록(완성)
+	 * 댓글 등록
 	 * @param boardDto
 	 * @param commentDto
 	 * @param session
@@ -418,7 +355,7 @@ public class ResaleBoardContoller {
 
 	
 	/**
-	 * 대댓글 등록(완성)
+	 * 대댓글 등록
 	 * @param boardDto
 	 * @param commentDto
 	 * @param session
@@ -442,8 +379,9 @@ public class ResaleBoardContoller {
 		}
 		return rb;
 	}
+	
 	/**
-	 * 댓글, 대댓글 삭제
+	 * 댓글 삭제
 	 * @param commentDto
 	 * @param session
 	 * @return
@@ -455,9 +393,6 @@ public class ResaleBoardContoller {
 		//		String loginedNickname = "개발자";
 
 		ResultBean<ResaleCommentDto> rb = new ResultBean<>();
-//
-//		Long resaleCmtParentNo = commentDto.getResaleCmtParentNo();
-//		System.out.println(("부모글번호"+resaleCmtParentNo)); // OK
 
 		try {
 			service.deleteComment(commentDto);
@@ -513,15 +448,11 @@ public class ResaleBoardContoller {
 	 */
 	@PostMapping(value = "like/add", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResultBean<ResaleLikeDto> addLike(@RequestBody ResaleLikeDto likeDto){
-//			@RequestBody ResaleBoardDto boardDto){
 
 		//		String loginedNickname = (String) session.getAttribute("loginNickname");
 //		String loginedNickname = "데빌";
 		ResultBean<ResaleLikeDto> rb = new ResultBean<>();
 		try {
-//			likeDto.setUserNickname(likeDto.);
-			
-//			likeDto.setResaleBoard(boardDto);
 			service.addLike(likeDto);
 			rb.setStatus(1);
 			rb.setMsg("좋아요 추가 성공");
@@ -546,14 +477,10 @@ public class ResaleBoardContoller {
 
 		//String loginedNickname = (String)session.getAttribute("loginNickname");
 		//		userNickname = "케빈";
-		//		logger.error("닉네임은" + userNickname);
 		logger.error("이름은 " + likeDto.getUserNickname());
 		//		logger.error("번호는" + likeDto.getResaleLikeNo());
 		logger.error("원글번호" + likeDto.getResaleBoard().getResaleBoardNo()); // null에러
 		ResultBean<ResaleLikeDto> rb = new ResultBean<>(); // 객체 생성
-		//		if(likeDto.getUserNickname() == null) {
-		//			rb.setMsg("로그인하세요");
-		//		}else if(userNickname.equals(likeDto.getUserNickname())) { // 로그인된 닉네임과 좋아요한 닉네임 같으면
 		try {
 			likeDto.getResaleBoard().getResaleBoardNo(); // null에러
 			logger.error("원글 번호는"+likeDto.getResaleBoard().getResaleBoardNo()); // null
@@ -567,14 +494,11 @@ public class ResaleBoardContoller {
 			rb.setStatus(0);
 			rb.setMsg("좋아요 삭제 실패");
 		}
-		//		}else {
-		//			rb.setMsg("로그인된 아이디와 좋아요한 아이디가 일치하지 않습니다");
-		//		}
 		return rb;
 	}
 	
 	/*
-	 * 게시글 목록 - 썸네일 파일 다운로드(노출)
+	 * 게시글 목록 - 썸네일 파일 다운로드
 	 */
 	@GetMapping(value ="/downloadimage")///{resaleBoardNo}") //GetMapping 사용 가능
 	public ResponseEntity<?>  downloadImage(String resaleBoardNo){//@PathVariable String resaleBoardNo){//String imageFileName) {
@@ -593,7 +517,7 @@ public class ResaleBoardContoller {
 	}
 	
 	/*
-	 * 게시글 상세 - 썸네일 파일 다운로드(노출)
+	 * 게시글 상세 - 썸네일 파일 다운로드
 	 */
 	@GetMapping(value ="/downloadimage/detail")///{resaleBoardNo}") //GetMapping 사용 가능
 	public ResponseEntity<?>  downloadImage(String fileName, String resaleBoardNo){//@PathVariable String resaleBoardNo){//String imageFileName) {

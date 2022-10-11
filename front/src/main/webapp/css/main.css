@@ -208,3 +208,7 @@ li:hover {
 #main>#wrapper>#container .col>.lsn {
     border: none;
 }
+
+div.col>div.lsn>div.lsn_content>h5.lsn_title{
+    margin-top: 10%;
+}

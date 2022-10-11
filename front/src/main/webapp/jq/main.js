@@ -75,7 +75,8 @@
 			'<p class="pro_name">프로이름 : ' + item.userInfo.userName + "</p>";
 			// product +='<p class="tag_name">태그이름 : ' + item.locNo + '</p>';// 지역번호/
 			product +=
-			'<p class="star_point">별점  : ' + item.lsnStarPoint + "</p></div>";
+			'<p class="star_point">별점  : ' + item.lsnStarScore + "</p></div>";
+			console.log(item.lsnStarScore);
 			product += "</div>";
 			// console.log(product);
 			let $copyObj = $lsnObj.clone(); //복제본 생성

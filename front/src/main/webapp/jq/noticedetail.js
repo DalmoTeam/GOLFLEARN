@@ -2,7 +2,7 @@
     //로딩 되자마자 글 목록 불러오기(1 페이지)
     // let url = "http://localhost:1126/backresale/resale/board/list/1";
     let queryString = location.search.split("=")[1];
-    // console.log(queryString);
+    console.log(queryString);
     let url = "http://localhost:1128/noticeboard/notice/" + queryString;
     let src = "../notice_image/";
     let boardNo = 0;
@@ -15,26 +15,47 @@
     $.ajax({
         url: url,
         method: "GET",
+        // async: false,
         success: function (jsonObj) {
         // console.log("----" + jsonObj.t.noticeBoardLikeCnt);
         if (jsonObj.status == 1) {
-            userNickname = jsonObj.t.userNickname;
+            userNickname = jsonObj.t.noticeBoard.userNickname;
             // console.log("user=" + userNickname);
-            boardNo = jsonObj.t.noticeBoardNo;
-            $("div.board__content__title").html(
-            "제목 : " + jsonObj.t.noticeBoardTitle
-            );
-            $("div.board__content__date").html(jsonObj.t.noticeBoardDt);
-            $("div.board__content__view_cnt").html(jsonObj.t.noticeBoardViewCnt);
-            $("div.board__content__like_cnt").html(jsonObj.t.noticeBoardLikeCnt);
-            $("div.board__content__thumbnail>img").attr(
-            "src",
-            src  + boardNo +  "/" + boardNo + "_image_" + "s_1" + ".jpeg"
-            // src + boardNo + "_image_" + "pyeonan.png"
-            );
-            $("div.board__content").html(jsonObj.t.noticeBoardContent);
+            boardNo = jsonObj.t.noticeBoard.noticeBoardNo;
 
-            let commentList = jsonObj.t.noticeCommentList;
+            let fileNameArr = jsonObj.t.imageFileNames;
+            // let dto = jsonObj.t.resaleBoard;
+            console.log("파일명 : " + fileNameArr);
+            console.log("----");
+            // console.log(dto);
+            console.log("저장된 파일 개수는 : " + fileNameArr.length);
+
+            let insertHtml = "";
+            let $parent = $("div.board__content__thumbnail");
+            for (let i = 0; i < fileNameArr.length; i++) {
+            insertHtml += "<img src=''";
+            // insertHtml += src + detailObj.resaleBoardNo + "/" + fileNameArr[i];
+            // insertHtml += " alt='' width='30%;' height=' 30%;'/>";
+            // insertHtml += "&nbsp;&nbsp";
+            //-----------------
+            }
+            $parent.append(insertHtml);
+
+
+            $("div.board__content__title").html(
+            "제목 : " + jsonObj.t.noticeBoard.noticeBoardTitle
+            );
+            $("div.board__content__date").html(jsonObj.t.noticeBoard.noticeBoardDt);
+            $("div.board__content__view_cnt").html(jsonObj.t.noticeBoard.noticeBoardViewCnt);
+            $("div.board__content__like_cnt").html(jsonObj.t.noticeBoard.noticeBoardLikeCnt);
+            // $("div.board__content__thumbnail>img").attr(
+            // "src",
+            // src  + boardNo +  "/" + boardNo + "_image_" + "s_1" + ".PNG"
+            // // src + boardNo + "_image_" + "pyeonan.png"
+            // );
+            $("div.board__content").html(jsonObj.t.noticeBoard.noticeBoardContent);
+
+            let commentList = jsonObj.t.noticeBoard.noticeCommentList;
             let $commentParent = $("div.comment-list");
 
             let $comment = $("div.comment-content").first();
@@ -62,7 +83,7 @@
             // $commentCopy.append("<button name='cmtModify'>수정</button>");
             // $commentCopy.append("<button name='cmtDelete'>댓글삭제</button>");
             cmtNickname = comment.userNickname;
-            cmtParentNo = comment.cmtParentNo;
+            // cmtParentNo = comment.cmtParentNo;
 
             // if(cmtParentNo == 0 ){
             //     $commentCopy.find("div.recomment-write").show();
@@ -73,19 +94,24 @@
             $commentParent.append($commentCopy);
 
             // 댓글 작성자에게만 댓글 수정및 삭제 show()
+            // console.log(cmtNickname);
             if (cmtNickname == loginedNickname) {
                 commentNo = comment.resaleCmtNo;
                 commentParentNo = comment.resaleCmtParentNo;
                 // console.log("댓글 번호 : " + commentNo);
+                cmtNickname = loginedNickname;
                 $commentCopy.find("div.comment-list__content__modify").show();
             } else {
                 $commentCopy.find("div.comment-list__content__modify").hide();
             }
+            console.log(cmtNickname+"//");
+            console.log(loginedNickname+"//");
             });
+            
             $comment.remove();
 
             // 좋아요 누른 사람들 목록
-            let likeObj = jsonObj.t.noticeLikeList;
+            let likeObj = jsonObj.t.noticeBoard.noticeLikeList;
             // console.log(likeObj);
 
             $.each(likeObj, function (i, like) {
@@ -98,13 +124,40 @@
                 } // each 의 if문
             // userNickname = detailObj.userNickname;
             });
-            boardNo = boardNo;
+            // boardNo = boardNo;
 
             // $("div.comment-list").html(jsonObj.t.noticeCommentList);
-        }
-        },
-        // error 작성바람
-    });
+        
+        //-----------------------------
+            let $imgs = $("div.board__content__thumbnail>img");
+            for (let i = 0; i < fileNameArr.length; i++) {
+            $.ajax({
+                url: "http://localhost:1128/noticeboard/notice/downloadimage/detail",
+                data: { fileName: fileNameArr[i], boardNo: boardNo },
+                method: "get",
+                // credentials:true,
+                cache: false,
+                xhrFields: {
+                responseType: "blob", //이미지 다운로드 문법
+                // withCredentials: true,
+                },
+                success: function (responseData) {
+                // 받아온 이미지들 객체를 넣어줌
+                let url = URL.createObjectURL(responseData);
+                //body > main > article > div > div.board-container > div.board__content__images > img:nth-child(1)
+                //"div.board__content__images
+                console.log("----------");
+                console.log($imgs); //[i]);
+                $($imgs[i]).attr("src", url);
+                },
+            });
+            } //end for
+        } // if문
+        }, // success
+        error: function (jsonObj) {
+        alert(jsonObj.msg);
+        }, // error
+    }); // ajax
     // return false;
 
      //--------  게시글 삭제 START -------- 

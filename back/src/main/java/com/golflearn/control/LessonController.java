@@ -2,14 +2,11 @@ package com.golflearn.control;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.ServletContext;
@@ -18,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.golflearn.dto.Lesson;
 import com.golflearn.dto.LessonClassification;
 import com.golflearn.dto.LessonLine;
+import com.golflearn.dto.Payment;
 import com.golflearn.dto.ResultBean;
 import com.golflearn.dto.UserInfo;
 import com.golflearn.exception.AddException;
@@ -59,39 +58,19 @@ public class LessonController {
 	private ServletContext sc;// 파일path설정 시 필요
 
 	@GetMapping("{lsnNo}")
-	public ResultBean<Map<String, Object>>viewLessonDetail(@PathVariable int lsnNo) {
-		Map<String, Object> map = new HashMap<>();
-
+	public ResultBean<Lesson> viewLessonDetail(@PathVariable int lsnNo) {
+		ResultBean<Lesson> rb = new ResultBean<>();
 		try {
-			Lesson lesson= service.viewLessonDetail(lsnNo);
-			map.put("Lesson", lesson);
-			//map.put("status", 1);
+			Lesson lesson = service.viewLessonDetail(lsnNo);
+			rb.setStatus(1); // 성공시 satus : 1
+			rb.setT(lesson); // lesson객체 담기
 		} catch (FindException e) {
 			e.printStackTrace();
-			map.put("status", 0);
+			rb.setStatus(0); // 성공 실패시 satus : 0
+			rb.setMsg(e.getMessage());
 		}
-
-		// 저장된 이미지 파일의 이름을 가지고 오는 것 -> 사진 불러올 때 저장된 개수만큼 불러와야함
-		String saveDirectory = uploadDirectory +"/"+ "lsn_images" + "/" +lsnNo + "/";
-//		System.out.println("경로는" + saveDirectory);
-		File dir = new File(saveDirectory);
-
-		String[] imageFiles = dir.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.contains("image_");
-			} //image라는 이름을 포함한 이미지명들 반환
-		});
-
-		map.put("imageFileNames", imageFiles);
-
-		ResultBean<Map<String,Object>> rb = new ResultBean<>();
-		rb.setStatus(1);
-		rb.setT(map);	
-
 		return rb;
 	}
-
 
 	@GetMapping(value = { "" })
 	public ResultBean<Lesson> list(@PathVariable Optional<Integer> optCp) { // 로그인 유무와 상관없이 다 볼수 있기때문에 httpSession 필요없음
@@ -133,9 +112,8 @@ public class LessonController {
 		}
 	}
 
-//	@Value("${spring.servlet.multipart.location}")
-//	String saveDirectory;// 파일경로생성
-	String uploadDirectory = "/images/";
+	@Value("${spring.servlet.multipart.location}")
+	String saveDirectory;// 파일경로생성
 	@PostMapping("request") // list타입 필드가 있는 Lesson전달과 파일첨부를 동시에 하기 위해 String타입으로 Lesson얻기
 	public ResponseEntity<?> reuqestLesson(@RequestPart(required = false) MultipartFile file, String strLesson) throws JsonMappingException, JsonProcessingException {
 
@@ -143,6 +121,7 @@ public class LessonController {
 		Lesson lesson = mapper.readValue(strLesson, Lesson.class);// String타입을 Lesson타입으로 변환
 //		String loginedId = lesson.getUserInfo().getUserId();
 		String loginedId = "jangpro@gmail.com";
+				
 		if (loginedId == null) {// 로그인 여부 확인
 			return new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 		} else {
@@ -155,10 +134,8 @@ public class LessonController {
 			try {
 				service.addLesson(lesson);//서비스 호출
 
-				int lsnNo = lesson.getLsnNo();
 				// -----이미지 업로드-----
-				String lessonPath = uploadDirectory +"/"+ "lsn_images" + "/" + lsnNo + "/";
-				
+				String lessonPath = saveDirectory + "lsn_images\\";// 파일경로
 				if (!new File(lessonPath).exists()) {
 					logger.info("업로드 실제경로생성");
 					new File(lessonPath).mkdirs();
@@ -226,4 +203,9 @@ public class LessonController {
 
 		}
 	}
+//	
+//	@PostMapping(value="")
+//	public ResultBean<Payment> payment(){
+//		
+//	}
 }

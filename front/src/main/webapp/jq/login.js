@@ -32,7 +32,7 @@ $(function () {
 				localStorage.setItem("loginedPhone", userObj.userPhone);
 				localStorage.setItem("loginedName", userObj.userName);
 
-
+				
 				// location.replace("http://localhost:1123/front/html/main.html");
 				location.replace("../html/main.html");
 				

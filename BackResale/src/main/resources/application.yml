@@ -5,16 +5,16 @@ spring:
         enabled: true
   datasource:
     hikari:
-#      username: future
-#      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-#      jdbc-url: jdbc:log4jdbc:oracle:thin:@localhost:1521:xe
-#      password: future
-#      minimum-idle: '2'
-      username: admin
+      username: future
       driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      jdbc-url: jdbc:log4jdbc:oracle:thin:@golflearn_medium?TNS_ADMIN=wallet/Wallet_golflearn
-      password: Dalmo08230823
+      jdbc-url: jdbc:log4jdbc:oracle:thin:@localhost:1521:xe
+      password: future
       minimum-idle: '3'
+#      username: admin
+#      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#      jdbc-url: jdbc:log4jdbc:oracle:thin:@golflearn_medium?TNS_ADMIN=wallet/Wallet_golflearn
+#      password: Dalmo08230823
+#      minimum-idle: '3'
   jpa:
     generate-ddl: 'true'
     database: oracle

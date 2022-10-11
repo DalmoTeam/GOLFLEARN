@@ -42,8 +42,6 @@ public class ResaleBoardService {
 	@Autowired
 	ResaleLikeRepository resaleLikeRepo;
 
-
-	//	private static final int CNT_PER_PAGE = 5; // 페이지별 보여줄 목록 수 
 	/**
 	 * 페이지별 게시글 목록과 페이지 그룹정보를 반환
 	 * @param resaleBoardNo
@@ -54,36 +52,10 @@ public class ResaleBoardService {
 		Page<ResaleBoardEntity> boardEntity = resaleBoardRepo.findAll(PageRequest.of(currentPage, 5, Sort.by("ResaleBoardNo").descending()));
 
 		ModelMapper modelMapper = new ModelMapper();
-		//		List<ResaleBoardDto> boarDto = boardEntity.getContent().stream().map(boardEntity ->
-		//		sourceToDestination(boardEntity, new ResaleBoardDto()))
-		//		.collect(Collectors.toList());
 		Page<ResaleBoardDto> boardDto = modelMapper.map(boardEntity, new TypeToken<Page<ResaleBoardDto>>(){}.getType());
 
-		//		Page<ResaleBoardDto> boardDto = 
-		//				boardEntity.getContent().stream().map(ResaleBoardEntity -> modelMapper.map(ResaleBoardEntity, ResaleBoardDto.class))
-		//				.collect(Collectors.toList());
-		//		
 		return boardDto;
 	}
-
-	//	public PageBean<ResaleBoardDto> boardList(int currentPage) throws FindException{ // 반환은 dto로, 주입은 entity
-	//		int endRow = currentPage * CNT_PER_PAGE;
-	//		int startRow = endRow - CNT_PER_PAGE + 1; 
-	//
-	//		List<ResaleBoardEntity> rbList = resaleBoardRepo.findByPage(startRow,endRow);
-	//		long totalCnt = resaleBoardRepo.count(); // 총 행수를 얻어오는 메서드
-	//		int cntPerPageGroup = 5;
-	//
-	//		ModelMapper modelMapper = new ModelMapper();
-	//		List<ResaleBoardDto> dtoList = 
-	//				rbList.stream().map(ResaleBoardEntity -> modelMapper.map(ResaleBoardEntity, ResaleBoardDto.class))
-	//				.collect(Collectors.toList());
-	//		
-	//		PageBean<ResaleBoardDto> pbDto = new PageBean<>(dtoList, totalCnt, currentPage, cntPerPageGroup, CNT_PER_PAGE);
-	//
-	//		return pbDto;
-	//	}
-
 
 
 	/**
@@ -127,7 +99,6 @@ public class ResaleBoardService {
 	 * @return
 	 * @throws FindException
 	 */
-
 	public Page<ResaleBoardDto> searchBoard(String word, int currentPage) throws FindException{
 
 		Page<ResaleBoardEntity> boardEntity 
@@ -139,24 +110,6 @@ public class ResaleBoardService {
 
 		return boardDto;
 	}
-	//	public PageBean<ResaleBoardDto> searchBoard(String word, int currentPage) throws FindException{
-	//		
-	//		int endRow = currentPage * CNT_PER_PAGE;
-	//		int startRow = endRow - CNT_PER_PAGE + 1;
-	//		List<ResaleBoardEntity> entityList = resaleBoardRepo.findByWord(word, startRow, endRow);
-	//		
-	//		int totalCnt = resaleBoardRepo.findCountByWord(word);
-	//		int cntPerPageGroup = 5;
-	//		
-	//		ModelMapper modelMapper = new ModelMapper();
-	//		List<ResaleBoardDto> dtoList = 
-	//				entityList.stream().map(ResaleBoardEntity -> modelMapper.map(ResaleBoardEntity, ResaleBoardDto.class))
-	//				.collect(Collectors.toList());
-	//		
-	//		PageBean<ResaleBoardDto> pb = 
-	//				new PageBean<>(dtoList, totalCnt, currentPage, cntPerPageGroup, CNT_PER_PAGE);
-	//		return pb;
-	//	}
 
 	/**
 	 * 게시글 작성
@@ -170,7 +123,7 @@ public class ResaleBoardService {
 		ResaleBoardEntity entity = modelMapper.map(dto, ResaleBoardEntity.class);
 		resaleBoardRepo.save(entity);
 
-		//-------- 파일 저장 경로에 폴더명을 게시글번호로 저장하기 위해 ----------
+		// 파일 저장 경로에 폴더명을 게시글번호로 저장하기 위해 반환
 		Optional<ResaleBoardEntity> optRb = resaleBoardRepo.findById(entity.getResaleBoardNo());
 		ResaleBoardEntity boardEntity = optRb.get();
 		ResaleBoardDto boardDto = modelMapper.map(boardEntity, ResaleBoardDto.class);
@@ -229,7 +182,7 @@ public class ResaleBoardService {
 
 
 	/**
-	 * 댓글 등록(완성)
+	 * 댓글 등록
 	 * 댓글 수도 같이 증가
 	 * @param commentDto
 	 * @throws AddException
@@ -241,17 +194,17 @@ public class ResaleBoardService {
 		ResaleBoardDto boardDto = commentDto.getResaleBoard();
 		//1. 댓글 테이블에서 그 글번호에 맞는 글이 있는지 확인
 		//2. 있으면 parentNo에 그 글번호를 넣음
-		//		Integer parentCmtCnt = resaleCommentRepo.findParentCmtNo(resaleBoardNo);
-		//		logger.error("부모댓글 수는 " + parentCmtCnt);
+		//	Integer parentCmtCnt = resaleCommentRepo.findParentCmtNo(resaleBoardNo);
+		//	logger.error("부모댓글 수는 " + parentCmtCnt);
 
-		//			logger.error("부모댓글번호는 "+ commentDto.getResaleCmtParentNo());
+		//	logger.error("부모댓글번호는 "+ commentDto.getResaleCmtParentNo());
 		logger.error("원글번호는 "+ resaleBoardNo);
 
 		// 댓글 등록
 		ModelMapper modelMapper = new ModelMapper();
 		ResaleCommentEntity commentEntity = modelMapper.map(commentDto, ResaleCommentEntity.class);
-		//			ResaleBoardEntity brdEntity = modelMapper.map(boardDto, ResaleBoardEntity.class);
 		resaleCommentRepo.save(commentEntity);
+		
 		// 댓글 수 증가
 		Optional <ResaleBoardEntity> optRb = resaleBoardRepo.findById(resaleBoardNo);
 		ResaleBoardEntity boardEntity = optRb.get(); 
@@ -388,7 +341,7 @@ public class ResaleBoardService {
 
 
 	/** 
-	 * 좋아요 추가(완성)
+	 * 좋아요 추가
 	 * 좋아요 수 같이 증가
 	 * @param resaleLike
 	 */
@@ -417,7 +370,7 @@ public class ResaleBoardService {
 	}
 
 	/**
-	 * 좋아요 취소(완성)
+	 * 좋아요 취소
 	 * 좋아요 수가 0 이상인 경우 같이 감소 (0인 경우 감소시키지 않음)
 	 * @param resaleLikeNo
 	 * @param resaleBoard

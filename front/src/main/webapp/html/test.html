@@ -1,0 +1,44 @@
+!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script>
+            $(function(){
+                $("#send").click(function(){
+                    alert("send start");
+                    $.ajax({
+                        url: "http://localhost:1123/back/test/send",
+                        method: "get",
+                        success: function(data){
+                            alert("send seccess" + data);
+                            location.href = "http://localhost:1123/front/html/test.html";
+                        }
+                    });
+                    alert("send end");
+                    return false;
+                }
+                );
+                $("#retr").click(function(){
+                    alert("retreve start");
+                    $.ajax({
+                        url: "http://localhost:1123/back/test/retr",
+                        method: "get",
+                        success: function(data){
+                            alert("retreve seccess :" + data);
+                            location.href = "http://localhost:1123/front/html/test.html";
+                        }
+                    });
+                    alert("retreve end");
+                    
+                    return false;
+                }
+                );
+            });
+        </script>
+    </head>
+    <body>
+        <button id="send">SEND</button>
+        
+        <button id="retr">RETRIEVE</button>
+    </body>
+</html>
