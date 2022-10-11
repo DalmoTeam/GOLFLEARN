@@ -17,7 +17,7 @@ public class LessonReviewOracleRepository implements LessonReviewRepository {
 	@Autowired
 	private SqlSessionFactory sqlSessionFactory;
 	
-	@Override //LessonLine>?
+	@Override
 	public Lesson selectTitleByLsnLineNo(int lsnLineNo) throws FindException {
 		SqlSession session = null;
 		try {
@@ -50,7 +50,7 @@ public class LessonReviewOracleRepository implements LessonReviewRepository {
 			}
 		}
 	}
-
+	
 	@Override
 	public void insertReview(LessonReview lsnReview) throws AddException {
 		SqlSession session = null;

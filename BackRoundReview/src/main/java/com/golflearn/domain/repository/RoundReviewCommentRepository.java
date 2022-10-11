@@ -9,6 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import com.golflearn.domain.entity.RoundReviewCommentEntity;
 
 public interface RoundReviewCommentRepository extends JpaRepository<RoundReviewCommentEntity, Long> {
+	/**
+	 * 댓글 삭제 
+	 * @param roundReviewCmtNo
+	 */
 	@Query(value="DELETE FROM round_review_comment "
 			+ "WHERE round_review_cmt_parent_no=?1"
 			,nativeQuery = true)
@@ -34,6 +38,4 @@ public interface RoundReviewCommentRepository extends JpaRepository<RoundReviewC
 			,nativeQuery = true)
 	void deleteRecomment(Long roundReviewCmtNo);
 	
-//	@Query()
-//	List<RoundReviewCommentEntity> findComments(Long roundReviewBoardNo);
 }

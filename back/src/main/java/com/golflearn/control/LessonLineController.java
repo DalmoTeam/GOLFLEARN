@@ -2,8 +2,6 @@ package com.golflearn.control;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,19 +22,15 @@ public class LessonLineController {
 	@Autowired
 	private LessonLineService service;
 	
-	//front딴에서 구별해버리기 
-//	public int userType(String userId) {
-//		return 0;
-//	}	
-	
-	@GetMapping(value = "student") //userId로 가는것이 맞나? 
+	/**
+	 * 수강생의 아이디에 해당되는 레슨내역 리스트를 보여줌 
+	 * @param userId
+	 * @return
+	 */
+	@GetMapping(value = "student")
 	public ResultBean<LessonLine> myPage(@RequestParam("userId") String userId) {
 		ResultBean<LessonLine> rb = new ResultBean<>();
-		//테스트주석
-//		String userId = (String)session.getAttribute("loginInfo");
-//		String userId = "zzeonsh@gmail.com";
 		try {
-			
 			List<LessonLine> lessonLine = service.myLessonList(userId);
 			rb.setStatus(1);
 			rb.setLt(lessonLine);
@@ -47,12 +41,14 @@ public class LessonLineController {
 		}
 		return rb;
 	}
+	/**
+	 * 프로의 아이디에 해당되는 레슨 리스트를 보여줌 
+	 * @param userId
+	 * @return
+	 */
 	@GetMapping(value = "pro")
 	public ResultBean<Lesson> myProPage(@RequestParam("userId") String userId){
 		ResultBean<Lesson> rb = new ResultBean<>();
-		//테스트주석
-//		String userId = (String)session.getAttribute("loginInfo");
-//		String userId = "ohpro@gmail.com";
 		try {
 			List<Lesson> lesson = service.proLessonList(userId);
 			rb.setStatus(1);
@@ -64,8 +60,4 @@ public class LessonLineController {
 		}
 		return rb;
 	}
-	//유저타입세션으로 받아오기 
-//	public int userType(String userId) {
-//		return 0;
-//	}
 }
