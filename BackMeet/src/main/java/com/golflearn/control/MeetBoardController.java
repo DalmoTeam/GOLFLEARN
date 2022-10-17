@@ -31,7 +31,7 @@ import com.golflearn.service.MeetBoardService;
 
 @CrossOrigin(origins = "*")//모든포트에서 접속가능 //메서드마다 각각 설정가능
 @RestController
-@RequestMapping("meet/board/*")
+@RequestMapping("/backmeet/meet/board/*")
 public class MeetBoardController {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -239,16 +239,20 @@ public class MeetBoardController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	//모임에 참여한다
-	@PostMapping(value = "add/{meetBoardNo}")	
+
+	// 모임에 참여한다
+	@PostMapping(value = "add/{meetBoardNo}")
 	public ResponseEntity<String> addMember(@PathVariable long meetBoardNo, @RequestParam String loginedNickname) {
-		try {
-			service.addMember(loginedNickname, meetBoardNo);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} catch (AddException e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		if (loginedNickname == null) {//로그인하지 않은 경우 
+			return new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+		} else {
+			try {
+				service.addMember(loginedNickname, meetBoardNo);//모임멤버에 추가 
+				return new ResponseEntity<>(HttpStatus.OK);
+			} catch (AddException e) {
+				e.printStackTrace();
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 		}
 	}
 	
