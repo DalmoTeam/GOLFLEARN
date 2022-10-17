@@ -276,10 +276,12 @@ public class MeetBoardService {
 	 * @param meetMemberDto
 	 * @throws AddException
 	 */
+	@Transactional
 	public void addMember(String userNickname, Long meetBoardNo) throws AddException{
 		Optional <MeetBoardEntity> optM = meetBoardRepo.findById(meetBoardNo);
 		MeetBoardEntity meetBoard = optM.get();//게시글 가져오기
 		int memberCheck = meetMemberRepo.countByUserNicknameMeetBoard(userNickname, meetBoardNo);//참여중인 모임인지 확인
+		
 		if(!optM.isPresent()) {//글이 없는 경우
 			throw new AddException("글이 없습니다.");
 		}else if(memberCheck  != 0){//이미 참여중인 경우
@@ -287,6 +289,9 @@ public class MeetBoardService {
 		}else if(meetBoard.getMeetBoardStatus() == 1 ){//해당 모임글이 모집마감인 경우
 			throw new AddException("모집중인 모임이 아닙니다");
 		}else{
+			meetBoard.setMeetBaordCurCnt(meetBoard.getMeetBaordCurCnt()+1);//현재인원을 1증가 
+			meetBoardRepo.save(meetBoard);
+			
 			MeetMemberEntity meetMember= new MeetMemberEntity();//DB에 저장할 모임멤버 객체 생성
 			meetMember.setMeetBoard(meetBoard);
 			meetMember.setUserNickname(userNickname);
@@ -302,12 +307,15 @@ public class MeetBoardService {
 	@Transactional
 	public void removeMeetMember(Long meetBoardNo, String userNickname) throws RemoveException{
 		Optional <MeetBoardEntity> optM = meetBoardRepo.findById(meetBoardNo);
+		MeetBoardEntity meetBoard = optM.get();//게시글 가져오기
 		int memberCheck = meetMemberRepo.countByUserNicknameMeetBoard(userNickname, meetBoardNo);//참여중인 모임인지 확인
 		if(!optM.isPresent()) {//글이 없는 경우
 			throw new RemoveException("글이 없습니다");
 		}else if(memberCheck == 0){//참여중인 모임이 아닌 경우
 			throw new RemoveException("참여중인 모임이 아닙니다");
 		}else{
+			meetBoard.setMeetBaordCurCnt(meetBoard.getMeetBaordCurCnt()-1);//현재인원 감소 
+			meetBoardRepo.save(meetBoard);
 			meetMemberRepo.DeleteByIdAndUserNickName(meetBoardNo, userNickname);
 		}
 	}
