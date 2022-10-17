@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
-import com.golflearn.dto.ChatRoomDto;
+import com.golflearn.dto.ChatRoom;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ChatService {
 
-    private Map<String, ChatRoomDto> chatRooms;
+    private Map<String, ChatRoom> chatRooms;
 
     @PostConstruct
     //의존관게 주입완료되면 실행되는 코드
@@ -29,22 +29,22 @@ public class ChatService {
     }
 
     //채팅방 불러오기
-    public List<ChatRoomDto> findAllRoom() {
+    public List<ChatRoom> findAllRoom() {
         //채팅방 최근 생성 순으로 반환
-        List<ChatRoomDto> result = new ArrayList<>(chatRooms.values());
+        List<ChatRoom> result = new ArrayList<>(chatRooms.values());
         Collections.reverse(result);
 
         return result;
     }
 
     //채팅방 하나 불러오기
-    public ChatRoomDto findById(String roomId) {
+    public ChatRoom findById(String roomId) {
         return chatRooms.get(roomId);
     }
 
     //채팅방 생성
-    public ChatRoomDto createRoom(String name) {
-    	ChatRoomDto chatRoom = ChatRoomDto.create(name);
+    public ChatRoom createRoom(String name) {
+        ChatRoom chatRoom = ChatRoom.create(name);
         chatRooms.put(chatRoom.getRoomId(), chatRoom);
         return chatRoom;
     }
