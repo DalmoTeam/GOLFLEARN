@@ -74,9 +74,9 @@ public interface MeetBoardRepository extends JpaRepository<MeetBoardEntity, Long
 	List<MeetBoardEntity> findByUserNickNameAndPage(String userNickname, int startRow, int endRow);
 	//참여중인 모임글의 목록을 불러온다
 	
-	@Query(value ="	SELECT COUNT(*)\r\n"
-			+ "	FROM meet_board\r\n"
-			+ "	WHERE user_nickname = ?1"
+	@Query(value ="	SELECT COUNT(*)\n"
+			+ "FROM meet_board b JOIN meet_member m ON (b.meet_board_no = m.meet_board_no)\n"
+			+ "WHERE m.user_nickname = ?1"
 			, nativeQuery = true)
 	int countByUserNicakname(String userNickName);
 	//참여중인 모임글의 수를 반환한다
