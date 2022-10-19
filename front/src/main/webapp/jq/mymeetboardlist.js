@@ -1,7 +1,7 @@
 $(function () {
     // let queryString = location.search.split("=")[1];
 
-    let url = "http://localhost:1129/backmeet/meet/board/mylist";
+    // let url = "http://localhost:1129/backmeet/meet/board/mylist";
     let loginedNickname = localStorage.getItem("loginedNickname");
     // console.log(loginedNickname);
     if(loginedNickname == null){
@@ -9,9 +9,10 @@ $(function () {
       location.href = "http://localhost:1124/front/html/main.html"
       return false;
     }
+
     function showList(url, data) {//게시글&페이지그룹에서 페이지클릭으로&검색버튼클릭으로 목록얻기
       $.ajax({
-        url: "http://localhost:1129/backmeet/meet/board/mylist",
+        url: url,
         method: 'get',
         data: {loginedNickname},
         success: function (jsonObj) {
@@ -22,7 +23,9 @@ $(function () {
             $board.show();
             //나머지 게시글 div는 삭제한다
             $('li.board-container').not($board).remove();
-  
+            
+            console.log(data);
+            
             let $boardParent = $board.parent();
             $(pageBeanObj.list).each(function (index, board) {
               let $boardCopy = $board.clone();//복제본
@@ -47,12 +50,12 @@ $(function () {
   
               //모집유형은 숫자값(0,1)므로 한글로 변경하여 넣기 
               $boardCopy.find("span.board-status").html("모집중");
-               $boardCopy.find('span.board-status').css('background-color', '#92B23B').css('color', 'white');
+              $boardCopy.find('span.board-status').css('background-color', '#92B23B').css('color', 'white');
 
               $boardParent.append($boardCopy);
               // $boardParent.last().remove;
-              $board.hide();
             });
+            $board.hide();
   
             //---------페이징처리 START---------
             let $pagegroup = $('div.pagegroup')
@@ -85,13 +88,11 @@ $(function () {
       });
       return false;
     }
-     //---------페이징처리 END---------
+    //---------페이징처리 END---------
   
     //---페이지 로드되자 마자 게시글1페이지 검색 START---
     showList('http://localhost:1129/backmeet/meet/board/mylist');
     //---페이지 로드되자 마자 게시글1페이지 검색 END---
-  
-   
 
     //---페이지 그룹의 페이지를 클릭 START---
     $('main>section>div.pagegroup').on('click', 'span:not(.disabled)', function () {//아래 if조건 대신 not 선택자 사용 
@@ -103,16 +104,15 @@ $(function () {
       } else {
         pageNo = parseInt($(this).html());
       }
+      
       // alert("보려는 페이지번호: " + pageNo);
-      let word = $('input[name=word]').val().trim();
-      let url = '';
-      let data = '';
-  
+      let url =  'http://localhost:1129/backmeet/meet/board/mylist/' + pageNo;
+      let data = 'loginedNickname=' + loginedNickname;
       console.log(url);
+      console.log(data);
       showList(url, data);
     });
     //---페이지 그룹의 페이지를 클릭 END---
-    //---게시글 hover 이벤트START-----
 
   });
   
