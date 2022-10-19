@@ -134,13 +134,15 @@ public class MeetBoardController {
 			if(loginedNickname == null){//로그인하지 않은 경우
 			rb.setStatus(0);
 				throw new FindException("로그인이 필요합니다.");
-				} else if (optCp.isPresent()) {//선택한 페이지가 있는 경우
+			} else if (optCp.isPresent()) {//선택한 페이지가 있는 경우
+				rb.setStatus(1);
 				currentPage = optCp.get();
 				pb = service.viewMyMeetBoard(loginedNickname, currentPage);
 			} else {//선택한 페이지가 없는 경우
+				rb.setStatus(1);
+				currentPage = 1;
 				pb = service.viewMyMeetBoard(loginedNickname, currentPage);
 			}
-			rb.setStatus(1);
 			rb.setT(pb);
 		} catch (FindException e) {
 			e.printStackTrace();
@@ -149,7 +151,7 @@ public class MeetBoardController {
 		}
 		return rb;
 	}
-	
+
 	//게시글 상세보기
 	@GetMapping("{meetBoardNo}")
 	public ResultBean<MeetBoardDto> viewBoard(@PathVariable long meetBoardNo) {
