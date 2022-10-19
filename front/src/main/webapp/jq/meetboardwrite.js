@@ -1,7 +1,25 @@
 $(function () {
     let loginedNickname = localStorage.getItem("loginedNickname");
-    //-----option값 DB에서 받기 START-----
-    //-----option값 DB에서 받기 END-----
+
+    //-----모임 카테고리 셀렉트 옵션으로 불러오기 START-----
+    $.ajax({
+		url: "http://localhost:1129/backmeet/meet/board/selectctg",
+		success: function (jsonObj) {
+			let $meetCtgOpt = $('select[name=meetCategory]');
+			let meetCtgHTML = '';
+            meetCtgHTML += '<option name="category"> 선택 </option>';
+            $(jsonObj).each(function (index, item) {//
+                meetCtgHTML += '<option name="category" value="' + item.meetCtgNo + '"';
+                meetCtgHTML += '>' + item.meetCtgTitle + '</option>';
+			})
+			$meetCtgOpt.html(meetCtgHTML);
+			return false;
+		},
+		error: function (jqXHR) {
+			// alert("error: " + jqXHR.status);
+		}
+	});
+    //-----모임 카테고리 셀렉트 옵션으로 불러오기 END-----
 
     //-----summernote 실행 START-----
     $('#summernote').summernote({
@@ -43,7 +61,7 @@ $(function () {
             let meetBoardContent = text;
             meetBoardMeetDt = meetBoardMeetDt.replaceAll('-', '/'); //날짜값 형태 변환 : 22/09/14
             let meetCtgNo = $('select[name=meetCategory]').val();
-
+            console.log(meetCtgNo);
             let data = {
                 "userNickname": loginedNickname,
                 "meetCategory": { "meetCtgNo": meetCtgNo },
