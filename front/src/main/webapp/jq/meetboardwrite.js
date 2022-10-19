@@ -21,6 +21,17 @@ $(function () {
 	});
     //-----모임 카테고리 셀렉트 옵션으로 불러오기 END-----
 
+    //-----모임날짜 선택 제한 START-----
+        let dateElement = document.getElementById('meet_board_meet_dt');
+        let date = new Date();
+        let year = date.getFullYear(); //년
+        let month = date.getMonth() + 1; //월
+        let day = date.getDate(); //일
+        let dString = year + '-' + month + '-' + day; //'yyyy-mm-dd'형식
+ 
+        dateElement.setAttribute("min", dString); //min속성 부여
+    //-----모임날짜 선택 제한 END-----
+
     //-----summernote 실행 START-----
     $('#summernote').summernote({
         placeholder: '내용을 입력해 주세요',
