@@ -1,7 +1,7 @@
 $(function () {
 	let loginedId = localStorage.getItem("loginedId");
 
-	//시도 목록 출력
+	//-----시군구 목록 옵션 불러오기 START-----
 	$.ajax({
 		url: "http://localhost:1124/back/seeksidosigu",
 		success: function (jsonObj) {
@@ -9,7 +9,6 @@ $(function () {
 			var arr = [];
 			let sido = '';
 			$(jsonObj.sido).each(function (key, item) {
-				// console.log(Object.values(item));
 				$keyObj = Object.keys(item);
 				$itemObj = Object.values(item);
 				for (let i = 0; i < $itemObj.length; i++) {
@@ -27,13 +26,12 @@ $(function () {
 		}
 	});
 
-	let $sidoCombo = $('select[name=sd]'); // 첫번째 시도를 선택하여 가져와야 함 option에 selected 된것을 가져와야함
+	let $sidoCombo = $('select[name=sd]'); 
 	let $sigunguCombo = $('select[name=sgg]');
 	$sidoCombo.change(function () {
-		// $sidoCombo.empty(); //사용자가 콤보박스를여러번 클릭했을때 append 되는것을 방지함
+		
 		$sigunguCombo.empty();
 		let $sidoVal = $(this);
-		console.log($sidoVal.val());
 		let sigungu = '';
 
 		$.ajax({
@@ -61,6 +59,7 @@ $(function () {
 
 		})
 	});
+	//-----시군구목록 옵션 불러오기 END-----
 
 	//-----summernote 실행 START-----
 	$("#summernote").summernote({
@@ -139,29 +138,10 @@ $(function () {
 	});
 	//-----summernote 실행 END-----
 
-	$(window).scroll(function () {
-		if ($(this).scrollTop() > 300) {
-			$('.btn_gotop').show();
-		} else {
-			$('.btn_gotop').hide();
-		}
-		return false;
-	});
-
-	$('.btn_gotop').click(function () {
-		$('html, body').animate({ scrollTop: 0 }, 400);
-		return false;
-	});
-
-	// ------------레슨정보 등록버튼 START------------
+	// ------------레슨정보 등록버튼 클릭 START------------
 	$("button[name='register']").click(function () {
 		let $formObj = $('form');
 		let formData = new FormData();//new FormData($FormObj[0]);
-		//-----------유저정보------------
-		// let userInfo = {};
-		// userInfo.userId = loginedId;
-		// console.log(loginedId);
-		// lesson.userInfo = userInfo;
 
 		//------------레슨정보------------
 		let lesson = {};
@@ -186,15 +166,21 @@ $(function () {
 			lsnClassifications[i] = { clubNo: $(clubNos[i]).val() };
 		}
 		lesson.lsnClassifications = lsnClassifications;
+		
+		//-----------유저정보------------
+		let userInfo = {};
+		userInfo.userId = loginedId;
+		lesson.userInfo = userInfo;
+
 		let strLesson = JSON.stringify(lesson);
 		formData.append("strLesson", strLesson);
 
 		let file = $("input[name=lsn_file]")[0];
 		formData.append("file", file.files[0]);
 
-		console.log(formData.get("strLesson"));
-		console.log(formData.get("file"));
-		console.log('------------');
+		// console.log(formData.get("strLesson"));
+		// console.log(formData.get("file"));
+		// console.log('------------');
 
 
 		$.ajax({
@@ -213,6 +199,7 @@ $(function () {
 		});
 		return false;
 	});
+	// ------------레슨정보 등록버튼 클릭 END------------
 
 	//--------------이미지파일업로드 미리보기 START--------------
 	$("input[name=lsn_file]").on("change", function (event) {
@@ -251,4 +238,6 @@ $(function () {
 		$('html, body').animate({ scrollTop: 0 }, 400);
 		return false;
 	});
+	//-----------상단이동버튼 클릭 END-------------
+
 });

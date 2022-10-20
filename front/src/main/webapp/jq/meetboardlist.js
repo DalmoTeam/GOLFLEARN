@@ -1,7 +1,6 @@
 $(function () {
-  // let loginedId = 'id1'; //테스트용 ,back요청X
 
-  function showList(url, data) {//게시글&페이지그룹에서 페이지클릭으로&검색버튼클릭으로 목록얻기
+  function showList(url, data) {//목록얻기
     $.ajax({
       url: url,
       method: 'get',
@@ -41,7 +40,7 @@ $(function () {
             }
             $boardCopy.find("p.board__body-content").html(meetBoardContent);
 
-            //모집유형은 숫자값(0,1)므로 한글로 변경고 각 색상 넣기 
+            //모집유형은 숫자값(0,1)므로 한글로 변경하고 각 색상 넣기 
             if (board.meetBoardStatus == 0) {
               $boardCopy.find('span.board-status').html("모집중");
               $boardCopy.find('span.board-status').css('background-color', '#92B23B').css('color', 'white');
