@@ -31,18 +31,17 @@ $(function () {
             $boardCopy.find("span.board-view_cnt").html(board.meetBoardViewCnt);
 
             //상세보기 링크 걸기
-            $boardCopy.find("a.board-link").attr("href", '../html/meetboarddetail.html?meet_board_no='+board.meetBoardNo);
+            $boardCopy.find("a.board-link").attr("href", '../html/meetboarddetail.html?meet_board_no=' + board.meetBoardNo);
 
             //글내용 summernote로 적용된 html태그 삭제
-            let meetBoardContent = board.meetBoardContent.replace(/(<([^>]+)>)/ig,"");
+            let meetBoardContent = board.meetBoardContent.replace(/(<([^>]+)>)/ig, "");
             //글내용이 30자 이상이면 30자까지만 노출 후 말줄임표 처리
-            if(meetBoardContent.length>= 30){
-              meetBoardContent = meetBoardContent.substr(0, 30)+ '…';
+            if (meetBoardContent.length >= 30) {
+              meetBoardContent = meetBoardContent.substr(0, 30) + '…';
             }
-            console.log(meetBoardContent);
             $boardCopy.find("p.board__body-content").html(meetBoardContent);
 
-            //모집유형은 숫자값(0,1)므로 한글로 변경하여 넣기 
+            //모집유형은 숫자값(0,1)므로 한글로 변경고 각 색상 넣기 
             if (board.meetBoardStatus == 0) {
               $boardCopy.find('span.board-status').html("모집중");
               $boardCopy.find('span.board-status').css('background-color', '#92B23B').css('color', 'white');
@@ -53,7 +52,7 @@ $(function () {
             }
             $boardParent.append($boardCopy);
           });
-            $board.hide();
+          $board.hide();
 
           //---------페이징처리 START---------
           let $pagegroup = $('div.pagegroup')
@@ -76,6 +75,7 @@ $(function () {
           }
 
           $pagegroup.html($pagegroupHtml);
+          //---------페이징처리 END---------
         } else {
           // alert(jsonObj.msg);
         }
@@ -86,11 +86,39 @@ $(function () {
     });
     return false;
   }
-   //---------페이징처리 END---------
 
   //---페이지 로드되자 마자 게시글1페이지 검색 START---
   showList('http://localhost:1129/backmeet/meet/board/list');
   //---페이지 로드되자 마자 게시글1페이지 검색 END---
+
+  //----모집상태별 필터 클릭 START----
+  $("input[type='checkbox']").click(function () {
+        
+    //3개의 필터중 하나만 클릭 가능
+    const checkboxes 
+    = document.getElementsByName("search__filter-status");
+    checkboxes.forEach((cb) => {
+      cb.checked = false;
+    })
+    this.checked = true;
+
+    //필터별 모집상태 값 가져오기
+    var status = $("input[name='search__filter-status']:checked").val();
+    let url = '';
+    let data = '';
+
+    if (status == "-1") {//전체를 클릭했을 때
+      url = 'http://localhost:1129/backmeet/meet/board/list';
+      data = "";
+    } else {
+      url = 'http://localhost:1129/backmeet/meet/board/filter/' + status;
+      data = "meetBoardStatus" + status;
+    }
+
+    showList(url, data);
+
+  });
+  //----모집상태별 필터 클릭 END----
 
   //---페이지 그룹의 페이지를 클릭 START---
   $('main>section>div.pagegroup').on('click', 'span:not(.disabled)', function () {//아래 if조건 대신 not 선택자 사용 
@@ -102,69 +130,38 @@ $(function () {
     } else {
       pageNo = parseInt($(this).html());
     }
-    // alert("보려는 페이지번호: " + pageNo);
+
     let word = $('input[name=word]').val().trim();
     let url = '';
     let data = '';
+    var status = $("input[name='search__filter-status']:checked").val();//필터 모집상태값 가져오기
 
-    //------모집상태별 필터 값 유지 START---------
-    var status = $("input[name='search__filter-status']:checked").val();
-    $("ul.search__filter-list").each(function (index, element) {
-      let $inputObj = $(element).find('input');
-      if ($inputObj.css("background-color") == 'rgb(255, 0, 0)') {
-        console.log(index, "color", $inputObj.css("background-color"));
-        status = index - 1;
-      }
-    });
-    //-----모집상태별 필터 값 유지 END---------
-
-    if (!status && word == '') {//모집상태 필터와 검색어가 없으면
+    if ( status == '-1' && word == '') {//필터가 전체로 선택되어 있으며 검색어가 없는 경우
       url = 'http://localhost:1129/backmeet/meet/board/list/' + pageNo;
       data = 'currentPage=' + pageNo;
-    } else if (word.length > 0) {//검색어가 있으면
+    } else if (word.length > 0) {//검색어가 있는 경우
       url = 'http://localhost:1129/backmeet/meet/board/search/' + word + '/' + pageNo;
       data = 'word=' + word + '&currentPage=' + pageNo;
-    } else {//모집상태 필터를 체크하면
-      console.log(status);
+    } else {//모집상태 필터가 모집중,모집완료로 선택된 경우
       url = 'http://localhost:1129/backmeet/meet/board/filter/' + status + '/' + pageNo;
       data = 'meetBoardStatus=' + status + '&currentPage=' + pageNo;
     }
-    console.log(url);
+
     showList(url, data);
   });
   //---페이지 그룹의 페이지를 클릭 END---
-
-  //----모집상태별 필터 클릭 START----
-  $("input[type='checkbox']").click(function () {
-    var status = $("input[name='search__filter-status']:checked").val();
-    console.log(status);
-    let url = '';
-    let data = '';
-    if (status == "2") {//전체를 클릭했을 때
-      url = 'http://localhost:1129/backmeet/meet/board/list';
-      data = "";
-    } else {
-      url = 'http://localhost:1129/backmeet/meet/board/filter/' + status;
-      data = "meetBoardStatus" + status;
-    }
-
-    $("input[type='checkbox']").css("background-color", "yellow"); //기본
-    $(this).css("background-color", "red"); //체크된 경우
-
-    console.log(url);
-    showList(url, data);
-  });
-  //----모집상태별 필터 클릭 END----
 
   //---검색 클릭 START---
   $('button[name=board-search]').click(function () {
     let word = $('input[name=word]').val().trim();
     let url = 'http://localhost:1129/backmeet/meet/board/search/' + word;
     let data = 'word=' + word;
+
+    // 검색 클릭 시 필터가 전체로 체크되어야함(추가예정)
     showList(url, data);
     return false;
   });
-  //---검색 클릭 END---
+  //---검색 클릭 END--- 
 
   //----글쓰기 버튼 클릭 START----
   $('button[name=write-button]').click(function () {
