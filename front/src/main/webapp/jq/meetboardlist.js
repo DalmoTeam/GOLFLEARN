@@ -19,8 +19,7 @@ $(function () {
           let $boardParent = $board.parent();
           $(pageBeanObj.list).each(function (index, board) {
             let $boardCopy = $board.clone();//복제본
-            // $boardCopy.find("a.board-link").html(board.meetBoardNo);
-            // $boardCopy.find("span.board-no").html(board.meetBoardNo);
+
             $boardCopy.find("span.board-ctg").html(board.meetCategory.meetCtgTitle);
             $boardCopy.find("span.board-nickname").html(board.userNickname);
             $boardCopy.find("h3.board-title").html(board.meetBoardTitle);
@@ -34,8 +33,13 @@ $(function () {
             //상세보기 링크 걸기
             $boardCopy.find("a.board-link").attr("href", '../html/meetboarddetail.html?meet_board_no='+board.meetBoardNo);
 
-            //글내용은 앞에서 30자만 보이기
-            let meetBoardContent = board.meetBoardContent.substr(0, 30)+ '…';
+            //글내용 summernote로 적용된 html태그 삭제
+            let meetBoardContent = board.meetBoardContent.replace(/(<([^>]+)>)/ig,"");
+            //글내용이 30자 이상이면 30자까지만 노출 후 말줄임표 처리
+            if(meetBoardContent.length>= 30){
+              meetBoardContent = meetBoardContent.substr(0, 30)+ '…';
+            }
+            console.log(meetBoardContent);
             $boardCopy.find("p.board__body-content").html(meetBoardContent);
 
             //모집유형은 숫자값(0,1)므로 한글로 변경하여 넣기 
