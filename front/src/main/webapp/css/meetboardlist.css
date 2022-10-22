@@ -147,18 +147,13 @@ li.board-container{
     flex: 1 1 590px;
 }
 
-
 .board__header, p.board__body-content, .board__body-sub{
     margin-top: 10px;
 }
 
-p.board__body-content{
-    font-weight:lighter;
-}
-
 .board__footer{
+    margin-top: 10px;
     color : #686868;
-    font-weight:lighter;
 }
 
 .board__aside{
@@ -170,7 +165,6 @@ p.board__body-content{
     justify-content: center;
     margin-bottom: 10px;
     right: 0px;
-    font-weight:lighter;
 }
 
 .board__aside-row{
@@ -242,4 +236,11 @@ a.board-link:hover{
 }
 div.board:hover{
  background: rgb(183 231 199 / 54%);
+}
+
+img[name='icon_viewcount']{
+ width:14px; 
+ height:14px;
+ margin-left: 5px;
+ filter: invert(42%) sepia(3%) saturate(5%) hue-rotate(13deg) brightness(95%) contrast(89%);
 }
