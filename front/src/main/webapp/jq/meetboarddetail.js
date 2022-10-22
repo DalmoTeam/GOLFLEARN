@@ -14,7 +14,6 @@ $(function () {
                 $("h1.board_title").html(jsonObj.t.meetBoardTitle);
                 $("span.user-nickname").html(jsonObj.t.userNickname);
 
-                // $("span.board__content-content").html(jsonObj.t.meetBoardContent);
                 //summernote태그 변환
                 $("span.board__content-content").html(jsonObj.t.meetBoardContent.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#40;/g, '(').replace(/&#41;/g, ')').replace(/&#35;/g, '#'));
 
@@ -81,7 +80,7 @@ $(function () {
         if (loginedNickname == null) {//로그인여부 확인
             alert("로그인이 필요합니다.");
             return false;
-        }else if (!confirm('모임에서 나가시겠습니까?')) {//로그인아이디를 같이 보낼 것
+        }else if (!confirm('모임에서 나가시겠습니까?')) {
             return false;
         } else {
             let meetBoardNo = queryString;
@@ -159,7 +158,6 @@ $(function () {
                 success: function () {
                     alert("삭제되었습니다.");
                     location.href = '../html/meetboardlist.html';
-                    // location.href = 'http://localhost:1123/front/html/meetboardlist.html';
                 },
                 error: function (jqXHR) {
                     alert(jqXHR.responseText);

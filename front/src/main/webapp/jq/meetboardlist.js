@@ -115,7 +115,7 @@ $(function () {
     }
 
     showList(url, data);
-
+    
   });
   //----모집상태별 필터 클릭 END----
 
@@ -147,6 +147,7 @@ $(function () {
     }
 
     showList(url, data);
+    return false;
   });
   //---페이지 그룹의 페이지를 클릭 END---
 

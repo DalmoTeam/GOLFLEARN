@@ -1,7 +1,8 @@
 $(function () {
 	let loginedId = localStorage.getItem("loginedId");
 
-	//-----시군구 목록 옵션 불러오기 START-----
+	//-----레슨지역 목록 불러오기 START-----
+	//시도 목록
 	$.ajax({
 		url: "http://localhost:1124/back/seeksidosigu",
 		success: function (jsonObj) {
@@ -13,7 +14,6 @@ $(function () {
 				$itemObj = Object.values(item);
 				for (let i = 0; i < $itemObj.length; i++) {
 					arr.push($itemObj[i]);
-					console.log($keyObj);
 					sido += '<option class="sido" name="sido" value="' + $keyObj[i] + '"';
 					sido += '>' + $itemObj[i] + '</option>';
 				}
@@ -22,7 +22,6 @@ $(function () {
 			return false;
 		},
 		error: function (jqXHR) {
-			alert("error: " + jqXHR.status);
 		}
 	});
 
@@ -33,7 +32,7 @@ $(function () {
 		$sigunguCombo.empty();
 		let $sidoVal = $(this);
 		let sigungu = '';
-
+		//시군구목록
 		$.ajax({
 			url: "http://localhost:1124/back/seeksidosigu/" + $sidoVal.val(),
 			success: function (jsonObj) {
@@ -41,7 +40,6 @@ $(function () {
 					$keyObj = Object.keys(item);
 					$itemObj = Object.values(item);
 					for (let i = 0; i < $itemObj.length; i++) {
-						console.log($keyObj);
 						sigungu += '<option class="sigungu" name="sigungu" value="' + $keyObj[i] + '"';
 						sigungu += '>' + $itemObj[i] + '</option>';
 					}
@@ -54,12 +52,11 @@ $(function () {
 				return false;
 			},
 			error: function (jqXHR) {
-				alert("error: " + jqXHR.status);
 			}
 
 		})
 	});
-	//-----시군구목록 옵션 불러오기 END-----
+	//-----레슨지역 목록 불러오기 END-----
 
 	//-----summernote 실행 START-----
 	$("#summernote").summernote({
@@ -143,7 +140,7 @@ $(function () {
 		let $formObj = $('form');
 		let formData = new FormData();//new FormData($FormObj[0]);
 
-		//------------레슨정보------------
+		//레슨정보
 		let lesson = {};
 		lesson.locNo = $('option[name=sigungu]').val();
 		lesson.lsnTitle = $('input[name=lsn_title]').val();
@@ -154,12 +151,10 @@ $(function () {
 		lesson.lsnCntSum = $('input[name=lsn_cnt_sum]').val();
 		lesson.lsnPerTime = $('input[name=lsn_per_time]').val();
 
-		let text = $('#summernote').summernote('code');
+		let text = $('#summernote').summernote('code');//summernote->text 데이터타입 변환
 		lesson.lsnIntro = text;
 
-		lesson.lsnDays = $('input[name=lsn_days]').val();
-
-		//------------레슨분류정보------------
+		//레슨분류정보
 		let lsnClassifications = [];
 		let clubNos = $("input[name=club_no]:checked");
 		for (let i = 0; i < clubNos.length; i++) {
@@ -167,7 +162,7 @@ $(function () {
 		}
 		lesson.lsnClassifications = lsnClassifications;
 		
-		//-----------유저정보------------
+		//유저정보
 		let userInfo = {};
 		userInfo.userId = loginedId;
 		lesson.userInfo = userInfo;
@@ -175,13 +170,13 @@ $(function () {
 		let strLesson = JSON.stringify(lesson);
 		formData.append("strLesson", strLesson);
 
+		//파일업로드
 		let file = $("input[name=lsn_file]")[0];
 		formData.append("file", file.files[0]);
 
 		// console.log(formData.get("strLesson"));
 		// console.log(formData.get("file"));
 		// console.log('------------');
-
 
 		$.ajax({
 			url: "http://localhost:1124/back/lesson/request",
