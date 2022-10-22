@@ -1,14 +1,11 @@
 package com.golflearn.control;
 
-import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +29,12 @@ public class LessonReviewController {
 	@Autowired
 	private LessonReviewService service;
 	
-	@GetMapping(value = "new") //userId로 가는것이 맞나? 
+	/**
+	 * 클릭한 레슨내역에 대한 리뷰를 작성함 
+	 * @param lsnLineNo
+	 * @return
+	 */
+	@GetMapping(value = "new")
 	public ResultBean<Lesson> newReview(@RequestParam("lsn_line_no") int lsnLineNo) {
 		ResultBean<Lesson> rb = new ResultBean<>();
 		try {
@@ -46,6 +48,11 @@ public class LessonReviewController {
 		}
 		return rb;
 	}
+	/**
+	 * 클릭한 레슨내역에 대한 후기를 수정함 
+	 * @param lsnLineNo
+	 * @return
+	 */
 	@GetMapping(value = "previous") 
 	public ResultBean<LessonLine> previous(@RequestParam("lsn_line_no") int lsnLineNo){
 		ResultBean<LessonLine> rb = new ResultBean<>();
@@ -60,22 +67,15 @@ public class LessonReviewController {
 		}
 		return rb;
 	}
-//	@PostMapping(value = "write", produces = MediaType.APPLICATION_JSON_VALUE)
-//	public ResponseEntity<?> write(@ModelAttribute LessonReview lsnReview, @RequestParam("lsn_line_no") int lsnLineNo) {
-//		try {
-//			LessonLine line = new LessonLine();
-//			line.setLsnLineNo(lsnLineNo);
-//			lsnReview.setLsnLine(line);
-//			service.writeReview(lsnReview);
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch (AddException e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>("내용은 필수 입력 사항입니다", HttpStatus.BAD_REQUEST);
-//		}
-//	}
-	@PostMapping(value = "write", produces = MediaType.APPLICATION_JSON_VALUE)
+	/**
+	 * 리뷰를 새로 작성함
+	 * @param lsnReview
+	 * @return
+	 */
+	@PostMapping(value = "write")
 	public ResponseEntity<?> write(@RequestBody LessonReview lsnReview) {
 		try {				
+			//리뷰의 내용이 null이거나 공백일 경우, 또는 별점이 0일경우에는 에러 메시지 출력
 			if(lsnReview.getReview() == null || lsnReview.getReview().equals("") 
 					|| lsnReview.getMyStarScore() == 0) {
 				return new ResponseEntity<>("글 내용과 별점을 입력해주세요", HttpStatus.BAD_REQUEST);
@@ -87,12 +87,15 @@ public class LessonReviewController {
 			return new ResponseEntity<>("내용은 필수 입력 사항입니다", HttpStatus.BAD_REQUEST);
 		}
 	}
-	@PutMapping(value = "modify", produces = MediaType.APPLICATION_JSON_VALUE)  //수정하기 코드이상할 수 있음 
+	/**
+	 * 리뷰를 수정함
+	 * @param lsnReview
+	 * @return
+	 */
+	@PutMapping(value = "modify")  
 	public ResponseEntity<?> modify(@RequestBody LessonReview lsnReview) {
-		//front에서 누른 lsnLineNo받아서 가져오기 
-//		LessonLine lsnLine = new LessonLine();
-		
 		try {
+			//리뷰의 내용이 null이거나 공백일 경우 에러 메시지 출력
 			if(lsnReview.getReview() == null || lsnReview.getReview().equals("")) {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
@@ -101,15 +104,6 @@ public class LessonReviewController {
 		} catch (ModifyException e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-//		lsnReview.getReview();
-//		lsnReview.getMyStarScore();
-		
-//		LessonReview lessonReview =
-//		
-//		lessonLine.setLsnLineNo(lsnRe);
-//		int lsnReviewNo = lsnReview.getLsnLine().getLsnLineNo();
-		
+		}		
 	}
 }

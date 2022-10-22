@@ -5,7 +5,7 @@ section{
 div.images > img {
     width : 450px;
     height : 450px;
-    margin-left: 250px;
+    margin-left: 50px;
     margin-top: 30px;
     /* object-fit:fill; */
 }

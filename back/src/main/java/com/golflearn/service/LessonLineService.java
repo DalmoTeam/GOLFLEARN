@@ -17,16 +17,7 @@ public class LessonLineService {
 	@Autowired
 	private LessonLineRepository repository;
 	
-
-
-	
 	public List<LessonLine> myLessonList(String userId) throws FindException{
-//		int userType = repository.selectTypeById(userId);  //0수강생 1프로
-//		if (userType == 0) {
-//			return lsnLineList;
-//		}else {
-//		}
-		
 		List<LessonLine> list = repository.selectById(userId);
 		return list;
 	}
@@ -35,9 +26,4 @@ public class LessonLineService {
 		List<Lesson> lessonList = repository.selectByProdId(userId);
 		return lessonList; 
 	}
-	
-//	public int returnUserType(String userId) throws FindException{
-//		int type = repository.selectTypeById(userId);
-//		return type;
-//	}
 }

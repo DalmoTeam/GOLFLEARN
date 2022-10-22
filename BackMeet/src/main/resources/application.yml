@@ -27,6 +27,11 @@ spring:
       driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
       jdbc-url: jdbc:log4jdbc:oracle:thin:@localhost:1521:xe
       minimum-idle: '3'
+#      password: Dalmo08230823
+#      username: admin
+#      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#      jdbc-url: jdbc:log4jdbc:oracle:thin:@golflearn_medium?TNS_ADMIN=wallet/Wallet_golflearn
+#      minimum-idle: '3'
   freemarker:
     cache: 'false'
   jackson:
