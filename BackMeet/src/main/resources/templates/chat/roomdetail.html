@@ -50,10 +50,11 @@
     var vm = new Vue({
         el: '#app',
         data: {
-            roomId: '',
+            roomId: '',//채팅방아이디 
             room: {},
-            sender: '',
-            message: '',
+            sender: '',//발신
+            message: '',//메세지 
+            createdDt:'',//발신시간 => 어디서 가져옴?
             messages: []
         },
         created() {

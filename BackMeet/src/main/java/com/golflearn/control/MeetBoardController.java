@@ -138,7 +138,7 @@ public class MeetBoardController {
 				rb.setStatus(1);
 				currentPage = optCp.get();
 				pb = service.viewMyMeetBoard(loginedNickname, currentPage);
-			} else {//선택한 페이지가 없는 경우
+			} else {//선택한 페이지가 없는 경우	
 				rb.setStatus(1);
 				currentPage = 1;
 				pb = service.viewMyMeetBoard(loginedNickname, currentPage);
@@ -173,7 +173,7 @@ public class MeetBoardController {
 	public  List<MeetCategoryDto> getoption() throws FindException{
 			 List<MeetCategoryDto> optionList = service.meetCategoryList();
 			 return optionList;
-	}
+	}	
 	
 	//게시글 작성하기
 	@PostMapping("write")

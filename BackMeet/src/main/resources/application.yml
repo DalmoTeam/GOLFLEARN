@@ -13,13 +13,6 @@ spring:
     database-platform: org.hibernate.dialect.Oracle10gDialect
     database: oracle
     show-sql: 'true'
-  thymeleaf:
-    cache: 'false'
-    prefix: classpath:src/main/resources/templates
-    check-template-location: 'true'
-    suffix: .html
-    order: '0'
-    mode: HTML5
   main:
     banner-mode: console
   devtools:
@@ -29,22 +22,17 @@ spring:
       enabled: 'true'
   datasource:
     hikari:
-      password: Dalmo08230823
-      username: admin
+      password: pass
+      username: system
       driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      jdbc-url: jdbc:log4jdbc:oracle:thin:@golflearn_high?TNS_ADMIN=wallet/Wallet_golflearn
+      jdbc-url: jdbc:log4jdbc:oracle:thin:@localhost:1521:xe
       minimum-idle: '3'
   freemarker:
     cache: 'false'
-  servlet:
-    multipart:
-      max-file-size: 1MB
-      max-request-size: 15MB
-      location: c:\files
   jackson:
     serialization:
       fail-on-empty-beans: 'false'
 server:
   port: '1129'
-  servlet:
-    context-path: /backmeet
+#  servlet:
+#    context-path: /backmeet

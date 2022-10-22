@@ -2,21 +2,23 @@ package com.golflearn.control;
 
 import java.util.List;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-import com.golflearn.dto.ChatRoomDto;
+import com.golflearn.dto.ChatRoom;
 import com.golflearn.service.ChatService;
 
 import lombok.RequiredArgsConstructor;
 
-@RestController
+@CrossOrigin(origins = "*")
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/chat")
 public class ChatRoomController {
@@ -30,13 +32,13 @@ public class ChatRoomController {
     // 모든 채팅방 목록 반환
     @GetMapping("/rooms")
     @ResponseBody
-    public List<ChatRoomDto> room() {
+    public List<ChatRoom> room() {
         return chatService.findAllRoom();
     }
     // 채팅방 생성
     @PostMapping("/room")
     @ResponseBody
-    public ChatRoomDto createRoom(@RequestParam String name) {
+    public ChatRoom createRoom(@RequestParam String name) {
         return chatService.createRoom(name);
     }
     // 채팅방 입장 화면
@@ -48,7 +50,7 @@ public class ChatRoomController {
     // 특정 채팅방 조회
     @GetMapping("/room/{roomId}")
     @ResponseBody
-    public ChatRoomDto roomInfo(@PathVariable String roomId) {
+    public ChatRoom roomInfo(@PathVariable String roomId) {
         return chatService.findById(roomId);
     }
 }

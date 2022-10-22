@@ -11,32 +11,32 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Repository;
 
-import com.golflearn.dto.ChatRoomDto;
+import com.golflearn.dto.ChatRoom;
 
 @Repository
 public class ChatRoomRepository {
 
-    private Map<String, ChatRoomDto> chatRoomDTOMap;
+    private Map<String, ChatRoom> chatRoomDTOMap;
 
     @PostConstruct
     private void init(){
         chatRoomDTOMap = new LinkedHashMap<>();
     }
 
-    public List<ChatRoomDto> findAllRooms(){
+    public List<ChatRoom> findAllRooms(){
         //채팅방 생성 순서 최근 순으로 반환
-        List<ChatRoomDto> result = new ArrayList<>(chatRoomDTOMap.values());
+        List<ChatRoom> result = new ArrayList<>(chatRoomDTOMap.values());
         Collections.reverse(result);
 
         return result;
     }
 
-    public ChatRoomDto findRoomById(String id){
+    public ChatRoom findRoomById(String id){
         return chatRoomDTOMap.get(id);
     }
 
-    public ChatRoomDto createChatRoomDTO(String name){
-    	ChatRoomDto room = ChatRoomDto.create(name);
+    public ChatRoom createChatRoomDTO(String name){
+    	ChatRoom room = ChatRoom.create(name);
         chatRoomDTOMap.put(room.getRoomId(), room);
 
         return room;
